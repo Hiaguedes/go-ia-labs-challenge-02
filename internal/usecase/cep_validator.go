@@ -23,7 +23,5 @@ func (u *CepValidatorUseCase) Execute(cep string) (CEPValidatorOutputDTO, error)
 		return CEPValidatorOutputDTO{}, fmt.Errorf("Invalid Zip Code")
 	}
 
-	cep = domain.CleanCep(cep)
-
 	return CEPValidatorOutputDTO{Cep: cep}, nil
 }

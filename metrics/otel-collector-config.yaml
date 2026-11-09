@@ -1,0 +1,49 @@
+# OpenTelemetry Collector pipeline used by the root docker-compose.yaml.
+# Receives OTLP from the metrics client and both services on 4317 (gRPC) /
+# 4318 (HTTP). Traces are forwarded to Jaeger and Zipkin; metrics are
+# exposed for Prometheus on 8889. The collector's own internal metrics are
+# exposed on 8888.
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+processors:
+  batch: {}
+
+exporters:
+  otlp_grpc/jaeger:
+    endpoint: jaeger-all-in-one:4317
+    tls:
+      insecure: true
+  zipkin:
+    endpoint: http://zipkin:9411/api/v2/spans
+  prometheus:
+    endpoint: 0.0.0.0:8889
+    # Keep resource attributes (e.g. service.name) as metric labels.
+    resource_to_telemetry_conversion:
+      enabled: true
+  debug:
+    verbosity: basic
+
+service:
+  telemetry:
+    metrics:
+      readers:
+        - pull:
+            exporter:
+              prometheus:
+                host: 0.0.0.0
+                port: 8888
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [otlp_grpc/jaeger, zipkin, debug]
+    metrics:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [prometheus]

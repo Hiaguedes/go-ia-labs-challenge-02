@@ -25,10 +25,11 @@ func (s *WebServer) AddHandler(path string, handler http.HandlerFunc) {
 	s.Handlers[path] = handler
 }
 
-// Handler registers the logger middleware and all added handlers on the
-// router and returns it, ready to be served.
+// Handler registers the logger and telemetry middlewares and all added handlers
+// on the router and returns it, ready to be served.
 func (s *WebServer) Handler() http.Handler {
 	s.Router.Use(middleware.Logger)
+	s.Router.Use(telemetryMiddleware)
 	for path, handler := range s.Handlers {
 		s.Router.Handle(path, handler)
 	}

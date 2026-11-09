@@ -10,7 +10,6 @@ FROM alpine:3.24
 RUN apk add --no-cache ca-certificates
 WORKDIR /app
 COPY --from=builder /app/bin/weather .
-# Non-secret default. WEATHER_API_KEY must be provided at runtime (see `make docker-run`).
 
 EXPOSE ${WEBSERVER_WEATHER_PORT}
 ENTRYPOINT ["./weather"]
