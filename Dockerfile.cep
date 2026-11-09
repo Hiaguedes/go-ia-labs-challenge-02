@@ -1,0 +1,15 @@
+FROM golang:1.27-alpine3.24 AS builder
+WORKDIR /app
+COPY go.mod go.sum ./
+RUN go mod download
+COPY . .
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /app/bin/cep ./cmd/cep
+
+FROM alpine:3.24
+# CA certificates are required for the HTTPS calls to ViaCEP and WeatherAPI.
+RUN apk add --no-cache ca-certificates
+WORKDIR /app
+COPY --from=builder /app/bin/cep .
+
+EXPOSE ${WEBSERVER_CEP_PORT}
+ENTRYPOINT ["./cep"]

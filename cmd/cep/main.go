@@ -16,7 +16,7 @@ func main() {
 		log.Fatal("Error loading configuration: ", err)
 	}
 
-	ws := webserver.NewWebServer(cfg.WebServerCepPort)
+	ws := webserver.NewWebServer(":" + cfg.WebServerCepPort)
 	cepHandler := web.NewHandler()
 	ws.AddHandler("/", cepHandler.CepValidatorHandler)
 	fmt.Println("server started at " + cfg.WebServerCepPort + "...")

@@ -16,7 +16,7 @@ func main() {
 		log.Fatal("Error loading configuration: ", err)
 	}
 
-	ws := webserver.NewWebServer(cfg.WebServerWeatherPort)
+	ws := webserver.NewWebServer(":" + cfg.WebServerWeatherPort)
 	weatherHandler := web.NewWeatherHandler(cfg.WeatherApiKey)
 	ws.AddHandler("/", weatherHandler.WeatherHandler)
 	fmt.Println("server started at " + cfg.WebServerWeatherPort + "...")
